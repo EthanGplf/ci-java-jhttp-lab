@@ -44,7 +44,7 @@ pipeline:
                     connectorRef: <+input>
                     repo: esglusto/ci-java-jhttp
                     tags:
-                      - latest
+                      - <+pipeline.sequenceId>
                   timeout: ""
                   type: BuildAndPushDockerRegistry
           platform:
