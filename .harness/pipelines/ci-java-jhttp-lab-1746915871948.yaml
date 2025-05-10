@@ -20,14 +20,22 @@ pipeline:
           execution:
             steps:
               - step:
+                  names: Run Unit Tests
                   type: Run
-                  identifier: build_java_app
+                  identifier: run_tests
                   name: Build Java App
                   spec:
                     shell: Sh
-                    command: |-
-                      echo "Welcome to Harness CI"
-                      mvn -B package --file pom.xml
+                    image: maven:3.8-jdk-11
+                    command: mvn clean test
+              - step:
+                  name: Package App
+                  identifier: package_app
+                  type: Run
+                  spec:
+                    shell: Sh
+                    image: maven:3.8-jdk-11
+                    command: mvn package -DskipTests
               - step:
                   identifier: dockerbuild
                   name: docker_build
