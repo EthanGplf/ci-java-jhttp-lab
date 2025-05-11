@@ -1,0 +1,107 @@
+pipeline:
+  identifier: Build_ci_java_jhttp_lab_v2
+  name: Build_ci_java_jhttp_lab_v2
+  orgIdentifier: default
+  projectIdentifier: default_project
+  properties:
+    ci:
+      codebase:
+        build: <+input>
+        connectorRef: org.github_ci_connector
+        repoName: ci-java-jhttp-lab
+  stages:
+    - stage:
+        identifier: build
+        name: build
+        spec:
+          caching:
+            enabled: true
+          cloneCodebase: true
+          execution:
+            steps:
+              - step:
+                  names: Run Unit Tests
+                  type: Run
+                  identifier: run_tests
+                  name: Build Java App
+                  spec:
+                    shell: Sh
+                    image: maven:3.8-jdk-11
+                    command: mvn clean test
+              - step:
+                  name: Package App
+                  identifier: package_app
+                  type: Run
+                  spec:
+                    shell: Sh
+                    image: maven:3.8-jdk-11
+                    command: mvn package -DskipTests
+              - step:
+                  identifier: dockerbuild
+                  name: docker_build
+                  spec:
+                    caching: true
+                    connectorRef: <+input>
+                    repo: esglusto/ci-java-jhttp
+                    tags:
+                      - <+pipeline.sequenceId>
+                  timeout: ""
+                  type: BuildAndPushDockerRegistry
+          platform:
+            arch: Amd64
+            os: Linux
+          runtime:
+            spec: {}
+            type: Cloud
+        type: CI
+    - stage:
+        name: deploy
+        identifier: deploy
+        description: Deploys the built Java HTTP app to a local Minikube cluster using Kubernetes manifests
+        type: Deployment
+        spec:
+          deploymentType: Kubernetes
+          service:
+            serviceRef: cijavajhttpservice
+            serviceInputs:
+              serviceDefinition:
+                type: Kubernetes
+                spec:
+                  artifacts:
+                    primary:
+                      primaryArtifactRef: <+input>
+                      sources: <+input>
+          environment:
+            environmentRef: Dev
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: minikubeinfra
+          execution:
+            steps:
+              - step:
+                  name: Rollout Deployment
+                  identifier: rolloutDeployment
+                  type: K8sRollingDeploy
+                  timeout: 10m
+                  spec:
+                    skipDryRun: false
+                    pruningEnabled: false
+            rollbackSteps:
+              - step:
+                  name: Rollback Rollout Deployment
+                  identifier: rollbackRolloutDeployment
+                  type: K8sRollingRollback
+                  timeout: 10m
+                  spec:
+                    pruningEnabled: false
+        tags:
+          java: ""
+          minikube: ""
+          deployment: ""
+          interview-lab: ""
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback
