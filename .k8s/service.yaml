@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ci-java-jhttp-service
+spec:
+  selector:
+    app: ci-java-jhttp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: NodePort
+apiVersion: v1
+kind: Service
+metadata:
+  name: ci-java-jhttp-service
+spec:
+  selector:
+    app: ci-java-jhttp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: NodePort
+

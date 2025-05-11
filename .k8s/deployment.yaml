@@ -1,0 +1,25 @@
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ci-java-jhttp
+  labels:
+    app: ci-java-jhttp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ci-java-jhttp
+  template:
+    metadata:
+      labels:
+        app: ci-java-jhttp
+    spec:
+      containers:
+        - name: ci-java-jhttp
+          image: esglusto/ci-java-jhttp:<+pipeline.sequenceId>
+          ports:
+            - containerPort: 8080
+
+
