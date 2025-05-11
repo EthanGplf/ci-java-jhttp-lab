@@ -1,5 +1,5 @@
 pipeline:
-  identifier: Build_ci_java_jhttp_lab_1746915873052
+  identifier: Build_ci_java_jhttp_lab_v2
   name: Build ci-java-jhttp-lab
   orgIdentifier: default
   projectIdentifier: default_project
