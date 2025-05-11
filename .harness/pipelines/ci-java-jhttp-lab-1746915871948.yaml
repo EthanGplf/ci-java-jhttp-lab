@@ -63,13 +63,6 @@ pipeline:
           deploymentType: Kubernetes
           service:
             serviceRef: cijavajhttpservice
-            serviceInputs:
-              serviceDefinition:
-                type: Kubernetes
-                spec:
-                  artifacts:
-                    primary:
-                      primaryArtifactRef: javahttpimage
           environment:
             environmentRef: Dev
             deployToAll: false
