@@ -36,36 +36,6 @@ pipeline:
                     shell: Sh
                     image: maven:3.8-jdk-11
                     command: mvn package -DskipTests
-              - step:
-                  name: Build and Push Multi-Arch Docker Image
-                  identifier: BuildAndPushDocker
-                  type: Run
-                  spec:
-                    connectorRef: your_dockerhub_connector
-                    image: docker:24.0.2
-                    shell: Sh
-                    command: |
-                      # Install dependencies
-                      apk add --no-cache docker-cli-buildx
-
-                      # Set up Docker buildx
-                      docker buildx create --use --name harness-multiarch-builder || docker buildx use harness-multiarch-builder
-                      docker buildx inspect --bootstrap
-
-                      # Authenticate to Docker Hub (already handled if using a connector)
-                      echo "$HARNESS_DOCKER_PASSWORD" | docker login -u "$HARNESS_DOCKER_USERNAME" --password-stdin
-
-                      # Build and push multi-arch image
-                      docker buildx build --platform linux/amd64,linux/arm64 \
-                        -t esglusto/ci-java-jhttp:<+pipeline.sequenceId> \
-                        --push .
-                    environmentVariables:
-                      HARNESS_DOCKER_USERNAME: <+secrets.getValue("dockerhub_username")>
-                      HARNESS_DOCKER_PASSWORD: <+secrets.getValue("dockerhub_password")>
-                    resources:
-                      limits:
-                        memory: 2Gi
-                        cpu: 2000m
           platform:
             os: Linux
             arch: Arm64
