@@ -20,10 +20,9 @@ pipeline:
           execution:
             steps:
               - step:
-                  names: Run Unit Tests
+                  name: Run Unit Tests
                   type: Run
                   identifier: run_tests
-                  name: Build Java App
                   spec:
                     shell: Sh
                     image: maven:3.8-jdk-11
@@ -39,18 +38,14 @@ pipeline:
               - step:
                   identifier: dockerbuild
                   name: docker_build
+                  type: BuildAndPushDockerRegistry
                   spec:
                     caching: true
                     connectorRef: <+input>
                     repo: esglusto/ci-java-jhttp
                     tags:
                       - <+pipeline.sequenceId>
-                  timeout: ""
-                  type: BuildAndPushDockerRegistry
-          platform:
-            arch: Amd64
-            os: Linux
-          runtime:
-            spec: {}
-            type: Cloud
+                  platform:
+                    arch: Arm64
+                    os: Linux
         type: CI
