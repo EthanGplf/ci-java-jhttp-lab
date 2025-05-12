@@ -67,11 +67,11 @@ pipeline:
                         memory: 2Gi
                         cpu: 2000m
           platform:
-            arch: Amd64
             os: Linux
+            arch: Arm64
           runtime:
-            spec: {}
             type: Cloud
+            spec: {}
         type: CI
     - stage:
         name: deploy
