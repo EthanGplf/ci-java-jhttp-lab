@@ -36,6 +36,17 @@ pipeline:
                     shell: Sh
                     image: maven:3.8-jdk-11
                     command: mvn package -DskipTests
+              - step:
+                  identifier: dockerbuild
+                  name: docker_build
+                  spec:
+                    caching: true
+                    connectorRef: <+input>
+                    repo: esglusto/ci-java-jhttp
+                    tags:
+                      - <+pipeline.sequenceId>
+                  timeout: ""
+                  type: BuildAndPushDockerRegistry
           platform:
             os: Linux
             arch: Arm64
