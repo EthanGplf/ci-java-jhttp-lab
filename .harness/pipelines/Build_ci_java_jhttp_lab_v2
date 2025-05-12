@@ -45,6 +45,28 @@ pipeline:
                     repo: esglusto/ci-java-jhttp
                     tags:
                       - <+pipeline.sequenceId>
+              - step:
+                  name: Build and Push Multi-Arch Image
+                  identifier: build_push_multiarch
+                  type: ShellScript
+                  spec:
+                    shell: Sh
+                    executionTarget:
+                      host: HarnessCloud # or your custom delegate if self-hosted
+                    source:
+                      type: Inline
+                      spec:
+                        script: |
+                          docker run --privileged --rm tonistiigi/binfmt --install all
+                          docker buildx create --use
+                          docker buildx build --platform linux/amd64,linux/arm64 \
+                            -t esglusto/ci-java-jhttp:${HARNESS_BUILD_ID} \
+                            --push .
+                    environmentVariables:
+                      - name: HARNESS_BUILD_ID
+                        type: String
+                        value: <+pipeline.sequenceId>
+
                   platform:
                     arch: Arm64
                     os: Linux
